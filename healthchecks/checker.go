@@ -19,6 +19,8 @@ func DoHealthChecks(chkConfig CheckConfig) error {
 
 				if err == nil {
 					checkSuccess = true
+				} else {
+					checkSuccess = false
 				}
 			}
 
@@ -27,8 +29,24 @@ func DoHealthChecks(chkConfig CheckConfig) error {
 
 				if checkSuccess {
 					fmt.Printf("Will send success to healthcheck.io with msg: %s\n", msg)
+
+					if checkDef.Action["pingurl"] != "" {
+						updateHealthCheckIO(checkDef.Action["pingurl"], msg)
+					}
+
 				} else {
 					fmt.Printf("Will send fail to healthcheck.io with msg: %s\n", msg)
+
+					if checkDef.Action["pingurl"] != "" {
+						updateHealthCheckIO(checkDef.Action["pingurl"]+"/fail", msg)
+					}
+				}
+
+			case "test":
+				if checkSuccess {
+					fmt.Printf("TEST ACTION: The check action succeeded: %s\n", msg)
+				} else {
+					fmt.Printf("TEST ACTION: The check action failed: %s\n", msg)
 				}
 			}
 		}
