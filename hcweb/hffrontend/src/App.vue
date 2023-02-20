@@ -13,7 +13,7 @@
     
     <div v-for="records in healthchecks">
       <div v-for="item in records">
-        <ACard>
+        <ACard >
           <div class="a-card-body a-card-spacer">  
             
             <ATypography
@@ -56,18 +56,13 @@
               
             </div>
 
-            <!-- <text class="text-[0.85rem] text-purple ">Target</text><br> 
-            <p class="text-[0.85rem]">{{ item.Check.target }}</p> 
-            <text class="text-[0.85rem] text-purple">Checks</text><br>
-            <AChip color="success">{{ item.Check.type }}</AChip><br>
-            <text class="text-[0.85rem] text-purple">Actions</text><br>
-            <AChip color="info">{{ item.Action.type }}</AChip> -->
-
             <br>
               <ASwitch
                 v-model="item.Enabled"
+                label="Enable/Disable"
                 @change="onChange(records)"
                 color="info"
+                class="flex mb-4 gap-2"
                 />
           </div> 
         </ACard> 
