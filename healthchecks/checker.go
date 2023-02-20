@@ -6,7 +6,6 @@ import (
 
 func DoHealthChecks(chkConfig Healthchecks, testmode bool) error {
 	log.Println("Doing healthchecks")
-	log.Println(chkConfig)
 
 	checkSuccess := false
 	msg := ""
