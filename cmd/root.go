@@ -28,9 +28,12 @@ var rootCmd = &cobra.Command{
 
 		// TODO: Should probably just use the global viper instance
 		// instead of passing around the config object
-		var checkCfg healthchecks.CheckConfig
+		var checkCfg healthchecks.Healthchecks
 		err := viper.Unmarshal(&checkCfg)
-		cobra.CheckErr(err)
+
+		if err != nil {
+			log.Fatal("Unable to parse config: ", err)
+		}
 
 		err = healthchecks.DoHealthChecks(checkCfg, testMode)
 		cobra.CheckErr(err)
