@@ -91,8 +91,6 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	// Testing writing config to a file
-
 	var checkCfg healthchecks.Healthchecks
 	err = viper.Unmarshal(&checkCfg)
 
@@ -115,7 +113,7 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		// found the check to update
+		// Found the check to update
 		if chkIdx > -1 {
 
 			newChkDef := healthchecks.CheckDef{}
@@ -150,9 +148,9 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 				log.Fatalf("unable to backup the config file")
 			}
 
-			// write new config
+			// Write new config
 			file, err := os.OpenFile(currentConfigFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-			//file, err := os.OpenFile("test.yml", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+
 			if err != nil {
 				log.Fatalf("error opening/creating file: %v", err)
 			}
