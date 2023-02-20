@@ -98,7 +98,7 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 		log.Println("unable to unmarshal config")
 	} else {
 
-		// find the check to update in the config
+		// Find the check to update in the config
 		chkIdx := -1
 		chkKey := ""
 
