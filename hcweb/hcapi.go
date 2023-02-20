@@ -103,7 +103,7 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 		chkKey := ""
 
 		for idx, check := range checkCfg.Healthchecks {
-			for key, _ := range check {
+			for key := range check {
 				_, ok := cfg[key]
 
 				if ok {
