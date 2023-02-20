@@ -1,4 +1,4 @@
-# healthchecker
+# Simple Service Healthchecker
 
 This is a utility to run simple health checks against various things and take some action. It is designed to be modular and extendable.
 
