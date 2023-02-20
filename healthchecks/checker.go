@@ -1,8 +1,10 @@
 package healthchecks
 
-import "fmt"
+import (
+	"log"
+)
 
-func DoHealthChecks(chkConfig CheckConfig) error {
+func DoHealthChecks(chkConfig CheckConfig, testmode bool) error {
 
 	checkSuccess := false
 	msg := ""
@@ -14,8 +16,15 @@ func DoHealthChecks(chkConfig CheckConfig) error {
 
 			switch checkDef.Check["type"] {
 			case "ping":
+
 				target := checkDef.Check["target"]
-				msg, err = doPing(target)
+
+				if !testmode {
+					msg, err = doPing(target)
+				} else {
+					log.Println("TEST MODE - Would have pinged target: " + target)
+					err = nil
+				}
 
 				if err == nil {
 					checkSuccess = true
@@ -28,25 +37,34 @@ func DoHealthChecks(chkConfig CheckConfig) error {
 			case "healthcheck.io":
 
 				if checkSuccess {
-					fmt.Printf("Will send success to healthcheck.io with msg: %s\n", msg)
+					log.Printf("Healthcheck for %s suceeded. Updating healthcheck.io. Msg: %s\n", checkDef.Check["target"], msg)
 
 					if checkDef.Action["pingurl"] != "" {
-						updateHealthCheckIO(checkDef.Action["pingurl"], msg)
+						if !testmode {
+							updateHealthCheckIO(checkDef.Action["pingurl"], msg)
+						} else {
+							log.Printf("TEST MODE - Would have run healthcheck.io ping\n")
+						}
 					}
 
 				} else {
-					fmt.Printf("Will send fail to healthcheck.io with msg: %s\n", msg)
+					log.Printf("Healthcheck for %s FAILED. Updating healthcheck.io. Msg: %s\n", checkDef.Check["target"], msg)
 
 					if checkDef.Action["pingurl"] != "" {
-						updateHealthCheckIO(checkDef.Action["pingurl"]+"/fail", msg)
+						if !testmode {
+							updateHealthCheckIO(checkDef.Action["pingurl"]+"/fail", msg)
+						} else {
+							log.Printf("TEST MODE - Would have run healthcheck.io fail ping\n")
+						}
+
 					}
 				}
 
 			case "test":
 				if checkSuccess {
-					fmt.Printf("TEST ACTION: The check action succeeded: %s\n", msg)
+					log.Printf("TEST ACTION: Healthcheck for %s succeeded. Msg: %s\n", checkDef.Check["target"], msg)
 				} else {
-					fmt.Printf("TEST ACTION: The check action failed: %s\n", msg)
+					log.Printf("TEST ACTION: Healthcheck for %s FAILED. Msg: %s\n", checkDef.Check["target"], msg)
 				}
 			}
 		}

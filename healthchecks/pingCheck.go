@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	// This is a patched copy of the prometheus community fork of the go-ping library to make it work on macOS
 	probing "github.com/andrewsjg/pro-bing"
 )
 

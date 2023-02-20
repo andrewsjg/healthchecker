@@ -4,15 +4,19 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
+	"github.com/andrewsjg/healthchecker/hcweb"
 	"github.com/andrewsjg/healthchecker/healthchecks"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var serverMode bool
+var testMode bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -22,12 +26,19 @@ var rootCmd = &cobra.Command{
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// TODO: Should probably just use the global viper instance
+		// instead of passing around the config object
 		var checkCfg healthchecks.CheckConfig
 		err := viper.Unmarshal(&checkCfg)
 		cobra.CheckErr(err)
 
-		err = healthchecks.DoHealthChecks(checkCfg)
+		err = healthchecks.DoHealthChecks(checkCfg, testMode)
 		cobra.CheckErr(err)
+
+		if serverMode {
+			hcweb.StartAPI(checkCfg, testMode)
+		}
+
 	},
 }
 
@@ -52,7 +63,11 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolVarP(&serverMode, "server", "s", false, "Help message for server")
+
+	// Dont run the checks, just report which checks will run
+	rootCmd.Flags().BoolVarP(&testMode, "test", "t", false, "Help message for test")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -74,12 +89,24 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+	viper.WatchConfig()
+
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		log.Println("Config file changed:", e.Name)
+
+		if err := viper.ReadInConfig(); err == nil {
+			//fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+
+		} else {
+			log.Println("Config error: " + err.Error())
+		}
+	})
 
 	// If a config file is found, read it in.
 	// TODO: Tidy this up
 	if err := viper.ReadInConfig(); err == nil {
 		//fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	} else {
-		fmt.Println("Config error: " + err.Error())
+		log.Println("Config error: " + err.Error())
 	}
 }

@@ -12,6 +12,7 @@ func updateHealthCheckIO(pingURL string, msg string) error {
 	}
 
 	_, err := client.Head(pingURL)
+
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
