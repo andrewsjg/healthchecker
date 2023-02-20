@@ -10,7 +10,6 @@ NOTES:
 - The checks are driven by an yaml config file an example of which doesnt yet exist in this repo
 - Current main branch probably doesnt work
 
-
-TODO: 
+TODO:
 
 - Separate the frontend and API
