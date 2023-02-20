@@ -11,8 +11,8 @@
 
   <div class="grid-row grid-cols-4">
     
-    <div v-for="check in checks">
-      <div v-for="item in check">
+    <div v-for="records in healthchecks">
+      <div v-for="item in records">
         <ACard>
           <div class="a-card-body a-card-spacer">  
             
@@ -25,16 +25,48 @@
               :subtitle="item.Description"
               class="text-[1.1rem]"
             />
-            <text class="text-[0.85rem] text-purple ">Target</text><br>
-            <p class="text-[0.85rem]">{{ item.Check.target }}</p>
+
+            <text class="text-[0.85rem] text-purple">Checks</text><br>
+            <div class="flex mb-4 gap-2"> 
+              <!-- <text class="text-[0.85rem] text-purple ">Target</text><br> 
+              <p class="text-[0.85rem]">{{ check.target }}</p> -->
+
+              <AChip
+                 v-for="check in item.Checks"
+                :key="check.type"
+                color="success"
+              >
+                {{ check.type }}
+             </AChip>
+              
+            </div>
+
+            <text class="text-[0.85rem] text-purple">Actions</text><br>
+            <div class="flex mb-4 gap-2"> 
+              <!-- <text class="text-[0.85rem] text-purple ">Target</text><br> 
+              <p class="text-[0.85rem]">{{ check.target }}</p> -->
+
+              <AChip
+                 v-for="action in item.Actions"
+                :key="action.type"
+                color="info"
+              >
+                {{ action.type }}
+             </AChip>
+              
+            </div>
+
+            <!-- <text class="text-[0.85rem] text-purple ">Target</text><br> 
+            <p class="text-[0.85rem]">{{ item.Check.target }}</p> 
             <text class="text-[0.85rem] text-purple">Checks</text><br>
             <AChip color="success">{{ item.Check.type }}</AChip><br>
             <text class="text-[0.85rem] text-purple">Actions</text><br>
-            <AChip color="info">{{ item.Action.type }}</AChip>
+            <AChip color="info">{{ item.Action.type }}</AChip> -->
+
             <br>
               <ASwitch
                 v-model="item.Enabled"
-                @change="onChange(check)"
+                @change="onChange(healthchecks)"
                 color="info"
                 />
           </div> 
@@ -57,7 +89,7 @@ export default {
   components: {},
   data() {
     return {
-      checks: [] as any,
+      healthchecks: [] as any,
       primary: ref(true)
     };
   },
@@ -66,7 +98,7 @@ export default {
     async getConfig() {
     
       const config = await axios.get(apiendpoint + "/getConfig")
-      this.checks = config.data.Checks
+      this.healthchecks = config.data.Checks
     },
     async onChange(item: any) {
       

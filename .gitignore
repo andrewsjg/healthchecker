@@ -1,1 +1,5 @@
 .healthchecker
+config.yaml
+*.bak
+newcfg.yml
+healthchecker

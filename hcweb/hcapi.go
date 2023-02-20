@@ -23,7 +23,7 @@ import (
 
 var frontend embed.FS
 
-func StartAPI(chkConfig healthchecks.CheckConfig, testmode bool) {
+func StartAPI(chkConfig healthchecks.Healthchecks, testmode bool) {
 	log.Println("Starting API")
 
 	stripped, err := fs.Sub(frontend, "hffrontend/dist")
@@ -42,7 +42,7 @@ func StartAPI(chkConfig healthchecks.CheckConfig, testmode bool) {
 
 }
 
-func getConfig(chkConfig healthchecks.CheckConfig) http.HandlerFunc {
+func getConfig(chkConfig healthchecks.Healthchecks) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//TODO: REFACTOR THIS
@@ -53,7 +53,7 @@ func getConfig(chkConfig healthchecks.CheckConfig) http.HandlerFunc {
 			http.Error(w, "could not read config", http.StatusInternalServerError)
 		}
 
-		var checkCfg healthchecks.CheckConfig
+		var checkCfg healthchecks.Healthchecks
 		err := viper.Unmarshal(&checkCfg)
 
 		if err != nil {
@@ -93,7 +93,7 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 
 	// Testing writing config to a file
 
-	var checkCfg healthchecks.CheckConfig
+	var checkCfg healthchecks.Healthchecks
 	err = viper.Unmarshal(&checkCfg)
 
 	if err != nil {
@@ -122,8 +122,8 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 
 			newChkDef := healthchecks.CheckDef{}
 			newCheck := make(map[string]healthchecks.CheckDef)
-			newActionBlock := make(map[string]string)
-			newCheckBlock := make(map[string]string)
+			newActionBlock := make(map[string]map[string]string)
+			newCheckBlock := healthchecks.Checks{}
 
 			newChkDef.Description = cfg[chkKey].Description
 			newChkDef.Name = cfg[chkKey].Name
@@ -131,15 +131,11 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 			// TODO: The logic for the action and check blocks will need to change
 			// when we want to support more than one action block per check
 
-			newCheckBlock["target"] = cfg[chkKey].Check.Target
-			newCheckBlock["type"] = cfg[chkKey].Check.Type
+			newCheckBlock = cfg[chkKey].Checks
+			newChkDef.Checks = newCheckBlock
 
-			newChkDef.Check = newCheckBlock
-
-			newActionBlock["type"] = cfg[chkKey].Action.Type
-			newActionBlock["pingUrl"] = cfg[chkKey].Action.Pingurl
-
-			newChkDef.Action = newActionBlock
+			newActionBlock = cfg[chkKey].Actions
+			newChkDef.Actions = newActionBlock
 
 			newChkDef.Enabled = cfg[chkKey].Enabled
 

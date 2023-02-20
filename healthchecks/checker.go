@@ -4,7 +4,9 @@ import (
 	"log"
 )
 
-func DoHealthChecks(chkConfig CheckConfig, testmode bool) error {
+func DoHealthChecks(chkConfig Healthchecks, testmode bool) error {
+	log.Println("Doing healthchecks")
+	log.Println(chkConfig)
 
 	checkSuccess := false
 	msg := ""
@@ -14,57 +16,64 @@ func DoHealthChecks(chkConfig CheckConfig, testmode bool) error {
 	for _, checkDefs := range chkConfig.Checks {
 		for _, checkDef := range checkDefs {
 
-			switch checkDef.Check["type"] {
-			case "ping":
+			// Perform the health checks
+			for _, check := range checkDef.Checks {
+				switch check["type"] {
+				case "ping":
 
-				target := checkDef.Check["target"]
+					target := check["target"]
 
-				if !testmode {
-					msg, err = doPing(target)
-				} else {
-					log.Println("TEST MODE - Would have pinged target: " + target)
-					err = nil
-				}
+					if !testmode {
+						msg, err = doPing(target)
+					} else {
+						log.Println("TEST MODE - Would have pinged target: " + target)
+						err = nil
+					}
 
-				if err == nil {
-					checkSuccess = true
-				} else {
-					checkSuccess = false
+					if err == nil {
+						checkSuccess = true
+					} else {
+						checkSuccess = false
+					}
 				}
 			}
 
-			switch checkDef.Action["type"] {
-			case "healthcheck.io":
+			// Perform the actions
 
-				if checkSuccess {
-					log.Printf("Healthcheck for %s suceeded. Updating healthcheck.io. Msg: %s\n", checkDef.Check["target"], msg)
+			for _, action := range checkDef.Actions {
+				switch action["type"] {
+				case "healthcheck.io":
 
-					if checkDef.Action["pingurl"] != "" {
-						if !testmode {
-							updateHealthCheckIO(checkDef.Action["pingurl"], msg)
-						} else {
-							log.Printf("TEST MODE - Would have run healthcheck.io ping\n")
+					if checkSuccess {
+						log.Printf("Updating healthcheck.io. Msg: %s\n", msg)
+
+						if action["pingurl"] != "" {
+							if !testmode {
+								updateHealthCheckIO(action["pingurl"], msg)
+							} else {
+								log.Printf("TEST MODE - Would have run healthcheck.io ping\n")
+							}
+						}
+
+					} else {
+						log.Printf("Healthcheck FAILED. Updating healthcheck.io. Msg: %s\n", msg)
+
+						if action["pingurl"] != "" {
+							if !testmode {
+								updateHealthCheckIO(action["pingurl"]+"/fail", msg)
+							} else {
+								log.Printf("TEST MODE - Would have run healthcheck.io fail ping\n")
+							}
+
 						}
 					}
 
-				} else {
-					log.Printf("Healthcheck for %s FAILED. Updating healthcheck.io. Msg: %s\n", checkDef.Check["target"], msg)
-
-					if checkDef.Action["pingurl"] != "" {
-						if !testmode {
-							updateHealthCheckIO(checkDef.Action["pingurl"]+"/fail", msg)
-						} else {
-							log.Printf("TEST MODE - Would have run healthcheck.io fail ping\n")
-						}
-
+				case "test":
+					if checkSuccess {
+						log.Printf("TEST ACTION: Healthcheck. Msg: %s\n", msg)
+					} else {
+						log.Printf("TEST ACTION: Healthcheck FAILED. Msg: %s\n", msg)
 					}
-				}
-
-			case "test":
-				if checkSuccess {
-					log.Printf("TEST ACTION: Healthcheck for %s succeeded. Msg: %s\n", checkDef.Check["target"], msg)
-				} else {
-					log.Printf("TEST ACTION: Healthcheck for %s FAILED. Msg: %s\n", checkDef.Check["target"], msg)
 				}
 			}
 		}

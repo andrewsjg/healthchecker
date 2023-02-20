@@ -1,35 +1,29 @@
 package healthchecks
 
 type CheckDef struct {
-	Description string `mapstructure:"description"`
-	Name        string `mapstructure:"name"`
-	Check       Check  `mapstructure:"check"`
-	Action      Action `mapstructure:"action"`
-	Enabled     bool   `mapstructure:"enabled"`
+	Description string  `mapstructure:"description"`
+	Name        string  `mapstructure:"name"`
+	Checks      Checks  `mapstructure:"checks"`
+	Actions     Actions `mapstructure:"actions"`
+	Enabled     bool    `mapstructure:"enabled"`
 }
 
-type CheckConfig struct {
-	Checks []map[string]CheckDef `mapstructure:"checks"`
+type Healthchecks struct {
+	Checks []map[string]CheckDef `mapstructure:"healthchecks"`
 }
 
-type Check map[string]string
+type Checks map[string]map[string]string
 
-type Action map[string]string
+type Actions map[string]map[string]string
 
 type CheckBlock struct {
 	Description string `json:"Description"`
 	Name        string `json:"Name"`
 	Enabled     bool   `json:"Enabled"`
 
-	Check struct {
-		Target string `json:"target"`
-		Type   string `json:"type"`
-	} `json:"Check"`
+	Checks Checks `json:"Checks"`
 
-	Action struct {
-		Type    string `json:"type"`
-		Pingurl string `json:"pingurl"`
-	} `json:"Action"`
+	Actions Actions `json:"Actions"`
 }
 
 /*
