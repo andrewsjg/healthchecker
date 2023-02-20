@@ -106,7 +106,7 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 		chkIdx := -1
 		chkKey := ""
 
-		for idx, check := range checkCfg.Checks {
+		for idx, check := range checkCfg.Healthchecks {
 			for key, _ := range check {
 				_, ok := cfg[key]
 
@@ -141,20 +141,20 @@ func setConfig(w http.ResponseWriter, req *http.Request) {
 
 			newCheck[chkKey] = newChkDef
 
-			checkCfg.Checks[chkIdx] = newCheck
+			checkCfg.Healthchecks[chkIdx] = newCheck
 
-			//currentConfigFilePath := viper.ConfigFileUsed()
+			currentConfigFilePath := viper.ConfigFileUsed()
 
 			// Backup the config file
-			//err = os.Rename(currentConfigFilePath, currentConfigFilePath+".bak")
+			err = os.Rename(currentConfigFilePath, currentConfigFilePath+".bak")
 
 			if err != nil {
 				log.Fatalf("unable to backup the config file")
 			}
 
 			// write new config
-			//file, err := os.OpenFile(currentConfigFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-			file, err := os.OpenFile("test.yml", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+			file, err := os.OpenFile(currentConfigFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+			//file, err := os.OpenFile("test.yml", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if err != nil {
 				log.Fatalf("error opening/creating file: %v", err)
 			}

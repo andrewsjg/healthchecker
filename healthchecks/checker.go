@@ -12,7 +12,7 @@ func DoHealthChecks(chkConfig Healthchecks, testmode bool) error {
 
 	var err error
 
-	for _, checkDefs := range chkConfig.Checks {
+	for _, checkDefs := range chkConfig.Healthchecks {
 		for _, checkDef := range checkDefs {
 
 			// Perform the health checks

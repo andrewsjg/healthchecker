@@ -66,7 +66,7 @@
             <br>
               <ASwitch
                 v-model="item.Enabled"
-                @change="onChange(healthchecks)"
+                @change="onChange(records)"
                 color="info"
                 />
           </div> 
@@ -98,7 +98,7 @@ export default {
     async getConfig() {
     
       const config = await axios.get(apiendpoint + "/getConfig")
-      this.healthchecks = config.data.Checks
+      this.healthchecks = config.data.Healthchecks
     },
     async onChange(item: any) {
       

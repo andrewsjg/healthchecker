@@ -9,7 +9,7 @@ type CheckDef struct {
 }
 
 type Healthchecks struct {
-	Checks []map[string]CheckDef `mapstructure:"healthchecks"`
+	Healthchecks []map[string]CheckDef `mapstructure:"healthchecks"`
 }
 
 type Checks map[string]map[string]string
