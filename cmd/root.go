@@ -39,7 +39,7 @@ var rootCmd = &cobra.Command{
 		cobra.CheckErr(err)
 
 		if serverMode {
-			hcweb.StartAPI(checkCfg, testMode)
+			hcweb.StartWebServer(checkCfg, testMode)
 		}
 
 	},

@@ -1,12 +1,9 @@
-package hcweb
+package api
 
 import (
 	"bytes"
-	"embed"
 	"encoding/json"
-	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,30 +16,7 @@ import (
 	"github.com/andrewsjg/healthchecker/healthchecks"
 )
 
-//go:embed hffrontend/dist
-
-var frontend embed.FS
-
-func StartAPI(chkConfig healthchecks.Healthchecks, testmode bool) {
-	log.Println("Starting API")
-
-	stripped, err := fs.Sub(frontend, "hffrontend/dist")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	frontendFS := http.FileServer(http.FS(stripped))
-	http.Handle("/", frontendFS)
-
-	http.Handle("/api/v1/getConfig", http.HandlerFunc(getConfig(chkConfig)))
-	http.Handle("/api/v1/setConfig", http.HandlerFunc(setConfig))
-
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%d", 8474), nil))
-
-}
-
-func getConfig(chkConfig healthchecks.Healthchecks) http.HandlerFunc {
+func GetConfig(chkConfig healthchecks.Healthchecks) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//TODO: REFACTOR THIS
@@ -74,7 +48,7 @@ func getConfig(chkConfig healthchecks.Healthchecks) http.HandlerFunc {
 	}
 }
 
-func setConfig(w http.ResponseWriter, req *http.Request) {
+func SetConfig(w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 
 	var cfg map[string]healthchecks.CheckBlock
