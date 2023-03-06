@@ -12,4 +12,6 @@ NOTES:
 
 TODO:
 
-- Separate the frontend and API
+- ~~ Separate the frontend and API ~~
+- Add UI elements for period of healthchecks
+- Add timers for healthchecks when running in server mode
