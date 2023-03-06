@@ -16,6 +16,7 @@ type Checks map[string]map[string]string
 
 type Actions map[string]map[string]string
 
+// type to map data sent to the API from the frontend
 type CheckBlock struct {
 	Description string `json:"Description"`
 	Name        string `json:"Name"`

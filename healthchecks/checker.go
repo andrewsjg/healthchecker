@@ -14,7 +14,7 @@ func DoHealthChecks(chkConfig Healthchecks, testmode bool) error {
 
 	for _, checkDefs := range chkConfig.Healthchecks {
 		for _, checkDef := range checkDefs {
-
+			log.Printf("Running healthcheck: %s\n", checkDef.Name)
 			// Perform the health checks
 			for _, check := range checkDef.Checks {
 				switch check["type"] {
@@ -34,6 +34,24 @@ func DoHealthChecks(chkConfig Healthchecks, testmode bool) error {
 					} else {
 						checkSuccess = false
 					}
+				case "http":
+					targetURL := check["target"]
+
+					if !testmode {
+						err = httpCheck(targetURL)
+					} else {
+						log.Println("TEST MODE - Would have checked URL target: " + targetURL)
+						err = nil
+					}
+
+					if err == nil {
+						msg = "HTTP Check returned 200"
+						checkSuccess = true
+					} else {
+						msg = "HTTP Check returned an error: " + err.Error()
+						checkSuccess = false
+					}
+
 				}
 			}
 
